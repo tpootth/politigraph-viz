@@ -1,0 +1,9 @@
+.DS_Store
+.ipynb_checkpoints/
+__pycache__/
+.venv/
+# raw/duplicate copies of the dataset; the site serves its own copy in site/files/
+data/raw/
+data/processed/
+observable/rada_leela/files/
+output/

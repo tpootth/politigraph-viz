@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Politigraph</title>
+<link rel="stylesheet" href="./inspector.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #ffffff; --fg: #1a1a1a; --muted: #666; --line: #e5e5e5; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111418; --fg: #e8e8e8; --muted: #9aa0a6; --line: #2a2f36; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font-family: "Sarabun", system-ui, sans-serif; line-height: 1.5;
+  }
+  main { max-width: 1080px; margin: 0 auto; padding: 32px 16px 64px; }
+  header h1 { margin: 0 0 4px; font-size: 2rem; }
+  header p { margin: 0; color: var(--muted); }
+  header a { color: inherit; }
+  .controls { display: grid; gap: 12px; margin: 24px 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; }
+  #chart { overflow-x: auto; }
+  #chart svg { max-width: 100%; height: auto; }
+  #status { color: var(--muted); padding: 24px 0; }
+  .controls, .controls label, .controls form { color: var(--fg); }
+  footer { margin-top: 48px; color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Politigraph — แต่ละพรรคโหวตมติยังไงบ้าง</h1>
+    <p>ข้อมูลการลงมติในสภา จาก <a href="https://politigraph.wevis.info/docs" target="_blank" rel="noopener">politigraph.wevis.info</a></p>
+  </header>
+
+  <section class="controls">
+    <div id="creatorFilter"></div>
+    <div id="categoryFilter"></div>
+  </section>
+
+  <div id="status">กำลังโหลดข้อมูล…</div>
+  <section id="chart"></section>
+
+  <footer>
+    Source notebook: <a href="https://observablehq.com/@politigraphtest/rada_leela" target="_blank" rel="noopener">@politigraphtest/rada_leela</a>
+  </footer>
+</main>
+
+<script type="module">
+import define from "./index.js";
+import {Runtime, Inspector} from "./runtime.js";
+
+// Render only the cells we want on the page; everything else still runs but stays hidden.
+const slots = {
+  "viewof creatorFilter": "creatorFilter",
+  "viewof categoryFilter": "categoryFilter",
+  "chart": "chart"
+};
+const status = document.getElementById("status");
+
+new Runtime().module(define, name => {
+  if (!(name in slots)) return;
+  const inspector = new Inspector(document.getElementById(slots[name]));
+  if (name !== "chart") return inspector;
+  return {
+    pending() { inspector.pending(); },
+    fulfilled(value) { status.remove(); inspector.fulfilled(value); },
+    rejected(error) { status.textContent = "โหลดไม่สำเร็จ: " + error.message; inspector.rejected(error); }
+  };
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "@politigraphtest/rada_leela",
+  "main": "cb14db9ba9975405@525.js",
+  "version": "525.0.0",
+  "homepage": "https://observablehq.com/@politigraphtest/rada_leela",
+  "author": {
+    "name": "politigraphtest",
+    "url": "https://observablehq.com/@politigraphtest"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4 - 5"
+  }
+}
