@@ -37,12 +37,12 @@ function _chart(d3,motions_fast,data_view)
   const DATA = data_view;          // ✅ ดาต้าดิบหลังกรอง ใช้ตอน tooltip/panel/stacked bar
 
   // ===== layout =====
-  const TITLE_H = 65;              // ความสูงพื้นที่หัวกราฟ
+  const TITLE_H = 10;              // ความสูงพื้นที่หัวกราฟ
   const W = 1000, H = 780;
   const margin = { top: 60 + TITLE_H, right: 20, bottom: 30, left: 60 };
 
   // ===== font & anim =====
-  const FONT_FAMILY = "Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif";
+  const FONT_FAMILY = "'IBM Plex Sans Thai', 'Sarabun', system-ui, sans-serif";
   const T = 280, E = 'cubic-bezier(.2,.7,.1,1)';
 
   // ===== scales =====
@@ -53,8 +53,8 @@ function _chart(d3,motions_fast,data_view)
   const rMotion = () => 10;
 
   // ===== colors =====
-  const NEON_GREEN="#39ff14", NEON_RED="#fa0f0f", GRAY="#9e9e9e";
-  const PURPLE_GRAY="#5a1b5d", DARK_GRAY="#424242";
+  const NEON_GREEN="#2a5f9e", NEON_RED="#b23a2e", GRAY="#c7bfae";
+  const PURPLE_GRAY="#8c8679", DARK_GRAY="#e8e2d6";
   const colorVoteTH = v => ({
     "เห็นด้วย": NEON_GREEN,
     "ไม่เห็นด้วย": NEON_RED,
@@ -63,7 +63,7 @@ function _chart(d3,motions_fast,data_view)
     "ลา / ขาดลงมติ": DARK_GRAY
   }[v] || GRAY);
   
-  const colorNormal = d => d.motion_result === "ผ่าน" ? "#2dc446" : "#c72828";
+  const colorNormal = d => d.motion_result === "ผ่าน" ? NEON_GREEN : NEON_RED;
 
   // ===== pre-position nodes =====
   M.forEach(d => { d.tx = x(d.year) + x.bandwidth()/2; d.ty = y(d.dayOfYear); d.x = d.tx; d.y = d.ty; });
@@ -85,11 +85,11 @@ function _chart(d3,motions_fast,data_view)
     .style("transition","transform 400ms ease")
     .style("font-family", FONT_FAMILY);
 
-  svg.append("rect").attr("fill","#0b1824").attr("width",W).attr("height",H)
+  svg.append("rect").attr("fill","#fbf9f4").attr("width",W).attr("height",H)
     .on("click", () => resetAll());
 
   // ===== axes grid =====
-  svg.append("g").attr("stroke","#bcd").attr("stroke-opacity",0.07)
+  svg.append("g").attr("stroke","#ebe5d9").attr("stroke-opacity",1)
     .selectAll("line").data(d3.range(1, maxDoy, 14)).join("line")
       .attr("x1", margin.left).attr("x2", W - margin.right)
       .attr("y1", d=>y(d)).attr("y2", d=>y(d));
@@ -97,9 +97,9 @@ function _chart(d3,motions_fast,data_view)
   // Axes
   const xAxis = g => g.attr("transform", `translate(0,${margin.top - 20})`)
     .call(d3.axisTop(x).tickSizeOuter(0))
-    .call(g=>g.selectAll("text").attr("fill","#dde3ea"))
-    .call(g=>g.selectAll(".domain").attr("stroke","#99aab5").attr("opacity",0.2))
-    .call(g=>g.selectAll(".tick line").attr("stroke","#99aab5").attr("opacity",0.2));
+    .call(g=>g.selectAll("text").attr("fill","#57524a").style("font-size","13px").style("font-weight",600))
+    .call(g=>g.selectAll(".domain").attr("stroke","#cfc7b8").attr("opacity",1))
+    .call(g=>g.selectAll(".tick line").attr("stroke","#cfc7b8").attr("opacity",1));
 
   const yearRef = years[0] ?? new Date().getFullYear();
   const months = d3.timeMonths(new Date(yearRef,0,1), new Date(yearRef+1,0,1));
@@ -109,7 +109,7 @@ function _chart(d3,motions_fast,data_view)
   const yAxis = g => g.attr("transform", `translate(${margin.left - 10},0)`)
     .call(d3.axisLeft(d3.scalePoint().domain(ticks.map(t=>t.doy)).range([H - margin.bottom, margin.top]))
       .tickFormat((_,i)=>ticks[i]?.label ?? "").tickSize(0))
-    .call(g=>g.selectAll("text").attr("fill","#cfd7df").style("font-size","11px"))
+    .call(g=>g.selectAll("text").attr("fill","#8c8679").style("font-size","11px"))
     .call(g=>g.selectAll(".domain").remove());
 
   svg.append("g").call(xAxis);
@@ -163,13 +163,13 @@ function _chart(d3,motions_fast,data_view)
   // pulse when hovering
 svg.append("style").text(`
   @keyframes pulseGlow {
-    0%   { filter: brightness(1) drop-shadow(0 0 3px currentColor); }
-    50%  { filter: brightness(2) drop-shadow(0 0 20px currentColor); }
-    100% { filter: brightness(1) drop-shadow(0 0 3px currentColor); }
+    0%, 100% { stroke-width: 2px; }
+    50%      { stroke-width: 7px; }
   }
 
   circle.motion.pulse-glow {
-    animation: pulseGlow 1.5s ease-in-out infinite;
+    animation: pulseGlow 1.8s ease-in-out infinite;
+    stroke: currentColor; stroke-opacity: .25;
     transform-origin: center;
   }
 `);
@@ -183,15 +183,15 @@ svg.append("style").text(`
     .attr("fill","#cee8ff")
     .attr("font-size",26)
     .attr("font-weight",700)
-    .text("แต่ละพรรคโหวตมติยังไงบ้างน้าา");
+    .text("");
 
   // ===== legend (เลื่อนขึ้นลงปรับ yOffset ได้) =====
   const legendYOffset = -10; // ปรับตรงนี้ได้ (+ ลง, - ขึ้น)
   const legend = svg.append("g").attr("transform", `translate(${W - 190}, ${margin.top - 50 + legendYOffset})`);
-  [["ผ่าน","#2fb546"],["ไม่ผ่าน","#bf3737"]].forEach((d,i)=>{
+  [["มติผ่าน",NEON_GREEN],["มติไม่ผ่าน",NEON_RED]].forEach((d,i)=>{
     const g = legend.append("g").attr("transform", `translate(${i*95},0)`);
-    g.append("circle").attr("r",6).attr("fill",d[1]).attr("cy",-2).attr("opacity",0.9);
-    g.append("text").attr("x",10).attr("y",2).text(d[0]).attr("font-size",11).attr("fill","#e7edf3");
+    g.append("circle").attr("r",5).attr("fill",d[1]).attr("cy",-4);
+    g.append("text").attr("x",10).attr("y",2).text(d[0]).attr("font-size",12).attr("fill","#57524a");
   });
 
   // ===== layers =====
@@ -204,24 +204,24 @@ svg.append("style").text(`
     .style("position", "fixed")
     .style("pointer-events", "none")
     .style("display", "none")
-    .style("background", "rgba(15,15,20,0.88)")
-    .style("color", "#e8f0ff")
-    .style("padding", "8px 10px")
-    .style("border-radius", "8px")
+    .style("background", "#fffdf8").style("border", "1px solid #e0d9cb")
+    .style("color", "#1c1a17")
+    .style("padding", "10px 14px")
+    .style("border-radius", "4px")
     .style("line-height", "1.45")
     .style("font-family", FONT_FAMILY)
     .style("font-size", "12px")
     .style("z-index", "9999")
-    .style("box-shadow", "0 2px 8px rgba(0,0,0,0.4)")
+    .style("box-shadow", "0 8px 28px rgba(40,30,10,0.12)")
     .style("max-width", "320px");
 
   // ===== hint =====
   const hint = svg.append("g").attr("pointer-events","none").attr("opacity",1).attr("transform",`translate(${W/2},${H/2})`);
   hint.append("rect")
-    .attr("x",-170).attr("y",-26).attr("rx",10).attr("ry",10)
-    .attr("width",340).attr("height",52)
-    .attr("fill","rgba(255,255,255,0.06)").attr("stroke","rgba(255,255,255,0.12)");
-  hint.append("text").attr("text-anchor","middle").attr("fill","#cfd7df").attr("font-size",14).attr("y",4)
+    .attr("x",-170).attr("y",-24).attr("rx",3).attr("ry",3)
+    .attr("width",340).attr("height",48)
+    .attr("fill","rgba(28,26,23,0.86)");
+  hint.append("text").attr("text-anchor","middle").attr("fill","#fbf9f4").attr("font-size",13).attr("y",4)
     .text("คลิกที่จุดญัตติเพื่อซูม • คลิกพื้นหลังเพื่อรีเซ็ต");
   const dismissHint = () => hint.interrupt().transition().duration(400).attr("opacity",0).remove();
   svg.on("mousedown.hint", dismissHint);
@@ -242,9 +242,9 @@ svg.append("style").text(`
   panel.style.right="0";
   panel.style.height=H+"px";
   panel.style.width="360px";
-  panel.style.background="rgba(12,14,20,0.97)";
-  panel.style.color="#e7edf3";
-  panel.style.padding="16px";
+  panel.style.background="#fffdf8";
+  panel.style.color="#1c1a17";
+  panel.style.padding="24px 22px";
   panel.style.overflow="auto";
   panel.style.backdropFilter="blur(6px)";
   panel.style.transition=`transform ${T}ms ${E}`;
@@ -279,11 +279,10 @@ svg.append("style").text(`
     .attr("fill", d => colorNormal(d))
     .attr("color", d => d.motion_result === "ผ่าน" ? NEON_GREEN : NEON_RED)
     .attr("r", rMotion())
+    .attr("stroke", "#fbf9f4").attr("stroke-width", 2)
     .attr("cx", d => d.x)
     .attr("cy", d => d.y)
     .attr("filter", d => 
-    d.motion_result === "ผ่าน" ? "url(#greenGlow)" :
-    d.motion_result === "ไม่ผ่าน" ? "url(#redGlow)" :
     null
   ) // permanent glow
     .style("cursor","zoom-in")
@@ -333,7 +332,7 @@ svg.append("style").text(`
         .attr("r", r0 * 2.2)                // ปรับได้ 2.0–3.0
         .attr("fill", haloColor)
         .transition().duration(120)
-        .attr("opacity", 0.75);
+        .attr("opacity", 0.22);
 
       // เติมสีตัวจุดให้สว่างขึ้นนิดหน่อย (ไม่ใช้ฟิลเตอร์)
       d3.select(e.currentTarget)
@@ -387,8 +386,8 @@ svg.append("style").text(`
       bottomBar.style.right = (360 + 28) + "px"; // หดบาร์เพื่อเว้นที่ panel
       panel.style.transform = "translateX(0)";
       svg.node().style.transform="translateX(-180px) scale(0.93)";
-      panel.style.borderLeft="1px solid rgba(255,255,255,0.08)";
-      panel.style.boxShadow="0 0 30px rgba(0,0,0,0.4)";
+      panel.style.borderLeft="1px solid #e0d9cb";
+      panel.style.boxShadow="-16px 0 40px rgba(40,30,10,0.08)";
     });
   }
   function closePanel() {
@@ -419,24 +418,24 @@ svg.append("style").text(`
     const linePct = Math.max(0, Math.min(100, 100 - agreePct));
   
     const header = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #e6e0d4;">
         <div>
-          <div style="font-weight:700;font-size:16px">${partyName}</div>
-          <div style="opacity:.75;font-size:12px;margin-top:2px">${motionTitle} · ${motionDate}</div>
+          <div style="font-family:'Noto Serif Thai',serif;font-weight:600;font-size:22px;line-height:1.25">${partyName}</div>
+          <div style="color:#8c8679;font-size:12px;margin-top:6px;line-height:1.5">${motionTitle} · ${motionDate}</div>
         </div>
-        <button id="btnClosePanel" style="background:#222;color:#e7edf3;border:1px solid #444;padding:6px 10px;border-radius:8px;cursor:pointer;font-family:${FONT_FAMILY};">ปิด</button>
+        <button id="btnClosePanel" style="background:transparent;color:#1c1a17;border:1px solid #cfc7b8;padding:4px 14px;border-radius:999px;cursor:pointer;flex:none;font-family:${FONT_FAMILY};">ปิด</button>
       </div>
     
       <div style="margin-bottom:12px;">
-        <div style="font-size:12px;margin-bottom:4px;opacity:.75">สัดส่วนคะแนน เห็นด้วย vs ไม่เห็นด้วย</div>
+        <div style="font-size:11px;letter-spacing:.08em;margin-bottom:8px;color:#8c8679">สัดส่วน เห็นด้วย / ไม่เห็นด้วย</div>
     
         <!-- ชั้นนอก: ไม่ปิด overflow เพื่อให้เส้นยื่นได้ -->
-        <div style="position:relative;height:16px;border-radius:8px;">
+        <div style="position:relative;height:8px;border-radius:4px;">
           
           <!-- พื้นหลังไล่สี: อยู่ชั้นใน และปิด overflow เพื่อให้มุมมน -->
           <div style="
             position:absolute; inset:0;
-            border-radius:8px; overflow:hidden;
+            border-radius:4px; overflow:hidden;
             background:linear-gradient(to right,${NEON_GREEN},${NEON_RED});
           "></div>
     
@@ -445,24 +444,28 @@ svg.append("style").text(`
             position:absolute;
             left:${linePct}%;
             top:-${EXT}px;                 /* ยื่นขึ้น */
-            height:${16 + EXT*2}px;        /* สูงกว่า bar */
+            height:${8 + EXT*2}px;        /* สูงกว่า bar */
             width:2px;
-            background:#fff;
+            background:#1c1a17;
             transform:translateX(-1px);    /* จัดให้อยู่กึ่งกลางพิกัด percentage */
             pointer-events:none;
           "></div>
         </div>
     
-        <div style="font-size:11px;margin-top:4px;opacity:.7;">
-          เห็นด้วย: ${agreePct.toFixed(1)}% | ไม่เห็นด้วย: ${disagreePct.toFixed(1)}%
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:10px;color:#57524a;">
+          <span><b style="color:${NEON_GREEN}">${agreePct.toFixed(1)}%</b> เห็นด้วย</span>
+          <span>ไม่เห็นด้วย <b style="color:${NEON_RED}">${disagreePct.toFixed(1)}%</b></span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:18px;font-size:11px;color:#57524a;">
+          ${Object.keys(order).map(k => `<span style="display:inline-flex;align-items:center;gap:6px"><i style="width:10px;height:10px;border-radius:2px;background:${colorVoteTH(k)};border:1px solid rgba(28,26,23,.12)"></i>${k}</span>`).join("")}
         </div>
       </div>
     `;
   
     const cells = rows.map((r,i)=>`
       <div class="cell" data-i="${i}"
-        style="width:18px;height:18px;border-radius:3px;background:${colorVoteTH(r.voter_option)};
-        border:1px solid rgba(0,0,0,.35);"></div>`).join("");
+        style="width:18px;height:18px;border-radius:2px;background:${colorVoteTH(r.voter_option)};
+        border:1px solid rgba(28,26,23,.10);"></div>`).join("");
   
     const grid = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(18px,1fr));gap:6px;">${cells}</div>`;
     panel.innerHTML = header + grid;
@@ -483,7 +486,7 @@ svg.append("style").text(`
 
 
   // ===== stacked bar (bottom) =====
-  const partyColor = d3.scaleOrdinal(d3.schemeTableau10);
+  const partyColor = d3.scaleOrdinal(["#c08a1e","#14907a","#8a4f9e"]);
 
   function renderDistributionBar(md) {
     if (isBarLocked && barSvg) return;
@@ -520,7 +523,7 @@ svg.append("style").text(`
       bottomBar.innerHTML = "";
       barSvg = d3.select(bottomBar).append("svg")
         .attr("height", 92).style("width","100%").style("display","block").style("margin","0 auto").style("pointer-events","auto");
-      barSvg.append("rect").attr("class","bg").attr("rx",10).attr("fill","rgba(255,255,255,0.05)");
+      barSvg.append("rect").attr("class","bg").attr("rx",4).attr("fill","#fffdf8").attr("stroke","#e6e0d4");
       barSvg.append("g").attr("class","segs");
       barSvg.append("g").attr("class","vals");
       barSvg.append("g").attr("class","names");
@@ -545,8 +548,9 @@ svg.append("style").text(`
     const segSel = barSvg.select(".segs").selectAll("rect.seg").data(lastSegments, d=>d.party);
     segSel.join(
       enter => enter.append("rect").attr("class","seg")
-        .attr("y",y0).attr("height",HBAR).attr("rx",6)
-        .attr("fill", d => d.party==="อื่น ๆ" ? "#6b7280" : partyColor(d.party))
+        .attr("y",y0).attr("height",HBAR).attr("rx",3)
+        .attr("stroke","#fffdf8").attr("stroke-width",2)
+        .attr("fill", d => d.party==="อื่น ๆ" ? "#b5ad9e" : partyColor(d.party))
         .attr("x", d => xs(d.x0)).attr("width", d => Math.max(1, xs(d.x1)-xs(d.x0))),
       update => (duration ? segSel.transition().duration(duration) : segSel)
         .attr("x", d => xs(d.x0)).attr("width", d => Math.max(1, xs(d.x1)-xs(d.x0)))
@@ -556,7 +560,7 @@ svg.append("style").text(`
     const LABEL_MIN_W = 46;
     const valSel = barSvg.select(".vals").selectAll("text.value").data(lastSegments, d=>d.party);
     valSel.join(
-      enter => enter.append("text").attr("class","value").attr("text-anchor","middle").attr("fill","#fff").attr("font-weight",800).attr("font-size",12)
+      enter => enter.append("text").attr("class","value").attr("text-anchor","middle").attr("fill","#fff").attr("font-weight",600).attr("font-size",12)
         .text(d => `${Math.round(d.pct*100)}% (${d.count})`)
         .attr("y", y0 + HBAR/2 + 4).attr("x", d => (xs(d.x0)+xs(d.x1))/2)
         .style("display", d => (xs(d.x1)-xs(d.x0)) >= LABEL_MIN_W ? "block" : "none"),
@@ -568,7 +572,7 @@ svg.append("style").text(`
     // names
     const nameSel = barSvg.select(".names").selectAll("text.pname").data(lastSegments, d=>d.party);
     nameSel.join(
-      enter => enter.append("text").attr("class","pname").attr("text-anchor","middle").attr("fill","#e7edf3").attr("font-weight",700).attr("font-size",12)
+      enter => enter.append("text").attr("class","pname").attr("text-anchor","middle").attr("fill","#57524a").attr("font-weight",500).attr("font-size",12)
         .text(d => d.party).attr("y", y0 + HBAR + 22).attr("x", d => (xs(d.x0)+xs(d.x1))/2),
       update => (duration ? nameSel.transition().duration(duration) : nameSel)
         .attr("x", d => (xs(d.x0)+xs(d.x1))/2)
@@ -611,8 +615,8 @@ svg.append("style").text(`
     nodes.classed("pulse-glow", d => d===md);
     
     nodes.transition().duration(400)
-      .attr("fill", d=>d===md ? colorNormal(d) : "#444")
-      .attr("opacity", d=>d===md ? 1 : 0.3);
+      .attr("fill", d=>d===md ? colorNormal(d) : "#ddd6c8")
+      .attr("opacity", d=>d===md ? 1 : 0.55);
 
     const k = 5, tx = W/2 - k*md.x, ty = H/2 - k*md.y;
     gMain.transition().duration(800).attr("transform",`translate(${tx},${ty}) scale(${k})`);
@@ -653,7 +657,7 @@ svg.append("style").text(`
     partyAgg.forEach((d,i) => { const a = angle(i); d.x = center.x + baseR*Math.cos(a); d.y = center.y + baseR*Math.sin(a); });
 
     const linkG = overlay.append("g", ":first-child")
-      .attr("stroke","rgba(255,255,255,.25)")
+      .attr("stroke","rgba(28,26,23,.22)")
       .attr("stroke-width", Math.max(1.0/k,0.6));
 
     const links = linkG.selectAll("line")
@@ -681,8 +685,8 @@ svg.append("style").text(`
 gParty.append("circle")
   .attr("r", d => rScale(d.totalVoted))
   .attr("fill", d => d.color)
-  .attr("stroke", "#222")
-  .attr("stroke-width", 0.1 / k)
+  .attr("stroke", "#fbf9f4")
+  .attr("stroke-width", 1.5 / k)
   .style("cursor", "pointer")
   .on("click", (e, d) => {
     e.stopPropagation();
@@ -759,7 +763,7 @@ function makePartyGlowFilter(id, color) {
     gParty.append("text")
       .attr("text-anchor", "middle")
       .attr("dy", "0.35em")
-      .attr("fill", "#000")
+      .attr("fill", "#fff")
       .attr("font-weight", 600)
       .attr("font-size", `${10 / k}px`)
       .style("cursor","pointer")
@@ -777,7 +781,7 @@ function makePartyGlowFilter(id, color) {
     gParty.append("text")
       .attr("text-anchor","middle")
       .attr("dy", d => -rScale(d.totalVoted) - (14 / k))
-      .attr("fill", "#e7edf3")
+      .attr("fill", "#1c1a17")
       .attr("font-size", `${10 / k}px`)
       .text(d => d.party);
 

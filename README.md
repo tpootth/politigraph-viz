@@ -10,6 +10,7 @@
 | `site/` | หน้าเว็บที่ deploy ขึ้น GitHub Pages (Observable runtime + notebook module + data) |
 | `site/files/12f39e…csv` | `parliament_trans.csv` ข้อมูลโหวต 107,826 แถว (ชื่อไฟล์เป็น hash ตามที่ notebook อ้างอิง) |
 | `observable/rada_leela/` | export ดิบจาก Observable (`rada_leela_source.js` = โค้ดทุก cell) |
+| `scripts/restyle_chart.py` | สคริปต์ที่ปรับสไตล์กราฟจาก export ดิบ (ธีมมืด/นีออน) เป็นธีม editorial ใน `site/` |
 | `notebooks/` | Python notebooks สำหรับ EDA / เตรียมข้อมูล |
 | `data/` | ข้อมูล raw/processed (ไม่ commit) |
 | `.github/workflows/deploy-pages.yml` | GitHub Action: push `main` ที่แก้ `site/**` แล้ว deploy อัตโนมัติ |

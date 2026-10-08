@@ -3,51 +3,206 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Politigraph</title>
+<title>เสียงในสภา — Politigraph</title>
+<meta name="description" content="แต่ละพรรคลงมติอย่างไรในสภาไทย 2563–2568 ข้อมูลจาก Politigraph (WeVis)">
 <link rel="stylesheet" href="./inspector.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=Noto+Serif+Thai:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #ffffff; --fg: #1a1a1a; --muted: #666; --line: #e5e5e5; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #111418; --fg: #e8e8e8; --muted: #9aa0a6; --line: #2a2f36; }
+  :root {
+    color-scheme: light;
+    --paper: #f6f2ea;
+    --card: #fbf9f4;
+    --ink: #1c1a17;
+    --ink-2: #57524a;
+    --muted: #8c8679;
+    --rule: #ddd5c6;
+    --hair: #e9e3d7;
+    --pass: #2a5f9e;
+    --fail: #b23a2e;
+    --gold: #a37a2c;
+    --serif: "Noto Serif Thai", Georgia, serif;
+    --sans: "IBM Plex Sans Thai", "Sarabun", system-ui, sans-serif;
   }
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
-    margin: 0; background: var(--bg); color: var(--fg);
-    font-family: "Sarabun", system-ui, sans-serif; line-height: 1.5;
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--sans); font-weight: 400; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
   }
-  main { max-width: 1080px; margin: 0 auto; padding: 32px 16px 64px; }
-  header h1 { margin: 0 0 4px; font-size: 2rem; }
-  header p { margin: 0; color: var(--muted); }
-  header a { color: inherit; }
-  .controls { display: grid; gap: 12px; margin: 24px 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; }
-  #chart { overflow-x: auto; }
-  #chart svg { max-width: 100%; height: auto; }
-  #status { color: var(--muted); padding: 24px 0; }
-  .controls, .controls label, .controls form { color: var(--fg); }
-  footer { margin-top: 48px; color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line); padding-top: 16px; }
+  a { color: inherit; text-decoration-color: var(--rule); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--ink); }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+  /* masthead */
+  .masthead { border-bottom: 1px solid var(--ink); }
+  .masthead .wrap {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+    padding-top: 18px; padding-bottom: 12px;
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2);
+  }
+  .masthead .brand { font-family: var(--serif); font-weight: 700; letter-spacing: .18em; color: var(--ink); }
+  .masthead + .rule { height: 3px; border-bottom: 1px solid var(--ink); }
+
+  /* hero */
+  .hero { padding: 64px 0 40px; text-align: center; }
+  .kicker {
+    display: inline-block; font-size: 12px; letter-spacing: .2em; color: var(--gold);
+    border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); padding: 4px 14px; margin-bottom: 28px;
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 600; font-size: clamp(2.4rem, 6vw, 4.2rem);
+    line-height: 1.15; margin: 0 0 20px; letter-spacing: -.01em;
+  }
+  .dek {
+    max-width: 640px; margin: 0 auto; font-size: 1.12rem; font-weight: 300; color: var(--ink-2);
+  }
+  .byline { margin-top: 24px; font-size: 13px; color: var(--muted); }
+
+  /* stats */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule);
+    margin: 8px 0 48px;
+  }
+  .stat { padding: 20px 20px 18px; border-left: 1px solid var(--hair); }
+  .stat:first-child { border-left: 0; }
+  .stat .label { font-size: 12px; letter-spacing: .08em; color: var(--muted); }
+  .stat .value {
+    font-family: var(--serif); font-weight: 600; font-size: 2.1rem; line-height: 1.2; margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .note { font-size: 12px; color: var(--ink-2); }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+
+  /* how to read */
+  .section-title {
+    display: flex; align-items: center; gap: 14px; margin: 0 0 20px;
+    font-family: var(--serif); font-weight: 600; font-size: 1.35rem;
+  }
+  .section-title::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+  .howto { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-bottom: 48px; }
+  .howto .n { font-family: var(--serif); font-size: 1.6rem; color: var(--gold); line-height: 1; }
+  .howto p { margin: 8px 0 0; font-size: .95rem; color: var(--ink-2); }
+
+  /* controls */
+  .controls {
+    display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 28px;
+    padding: 22px 0; margin-bottom: 20px;
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  }
+  .controls form { font-family: var(--sans) !important; font-size: 14px !important; color: var(--ink) !important; margin: 0 !important; width: auto !important; max-width: none !important; display: block !important; }
+  .controls form > label {
+    display: block !important; width: auto !important; margin-bottom: 8px !important; padding: 0 !important;
+    font-size: 12px !important; letter-spacing: .08em; color: var(--muted) !important;
+  }
+  .controls select {
+    width: 100%; font: inherit; color: var(--ink); background: var(--card);
+    border: 1px solid var(--rule); border-radius: 2px; padding: 8px 10px;
+  }
+  .controls form > div { display: flex !important; flex-wrap: wrap; gap: 6px; }
+  .controls form > div > label {
+    display: inline-flex !important; align-items: center; gap: 6px; margin: 0 !important;
+    padding: 4px 12px; border: 1px solid var(--rule); border-radius: 999px; background: var(--card);
+    font-size: 13px; cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .controls form > div > label:hover { border-color: var(--ink-2); }
+  .controls form > div > label:has(input:checked) { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .controls input[type=checkbox] { accent-color: var(--ink); margin: 0; }
+
+  /* figure */
+  figure { margin: 0 0 16px; }
+  .frame { background: var(--card); border: 1px solid var(--rule); overflow-x: auto; }
+  #chart > div { margin: 0 auto; }
+  #status { padding: 120px 24px; text-align: center; color: var(--muted); font-style: italic; font-family: var(--serif); }
+  figcaption { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 12px; color: var(--muted); }
+
+  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin: 56px 0 0; font-size: .92rem; color: var(--ink-2); }
+  .notes h3 { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; color: var(--ink); margin: 0 0 8px; }
+  .notes p { margin: 0; }
+
+  footer { margin-top: 72px; border-top: 1px solid var(--ink); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-top: 18px; padding-bottom: 40px; font-size: 12px; color: var(--muted); }
+  footer .brand { font-family: var(--serif); font-weight: 700; letter-spacing: .18em; color: var(--ink); }
+
+  /* Observable inspector chrome off */
+  .observablehq--error { color: var(--fail); font-family: var(--sans); }
+
+  @media (max-width: 760px) {
+    .stats { grid-template-columns: 1fr 1fr; }
+    .stat:nth-child(3) { border-left: 0; }
+    .stat:nth-child(n+3) { border-top: 1px solid var(--hair); }
+    .howto, .notes, .controls { grid-template-columns: 1fr; gap: 20px; }
+    .hero { padding: 40px 0 28px; }
+    .masthead .edition { display: none; }
+  }
 </style>
 </head>
 <body>
-<main>
-  <header>
-    <h1>Politigraph — แต่ละพรรคโหวตมติยังไงบ้าง</h1>
-    <p>ข้อมูลการลงมติในสภา จาก <a href="https://politigraph.wevis.info/docs" target="_blank" rel="noopener">politigraph.wevis.info</a></p>
+
+<div class="masthead"><div class="wrap">
+  <span class="brand">POLITIGRAPH</span>
+  <span class="edition">รายงานข้อมูล · การลงมติในรัฐสภาไทย</span>
+</div></div>
+<div class="rule"></div>
+
+<main class="wrap">
+  <header class="hero">
+    <div class="kicker">พ.ศ. ๒๕๖๓ – ๒๕๖๘</div>
+    <h1>เสียงในสภา</h1>
+    <p class="dek">ร่างกฎหมายและญัตติ 180 เรื่อง สมาชิกกว่าหนึ่งพันคน กับคำถามเดียว — แต่ละพรรคยกมือให้อะไร และปฏิเสธอะไร</p>
+    <div class="byline">ข้อมูลจาก <a href="https://politigraph.wevis.info/docs" target="_blank" rel="noopener">Politigraph · WeVis</a></div>
   </header>
 
-  <section class="controls">
+  <section class="stats" aria-live="polite">
+    <div class="stat"><div class="label">ครั้งที่ลงมติ</div><div class="value" id="s-motions">—</div><div class="note" id="s-motions-note">&nbsp;</div></div>
+    <div class="stat"><div class="label">มติผ่าน</div><div class="value" id="s-pass">—</div><div class="note"><span class="dot" style="background:var(--pass)"></span><span id="s-pass-pct">—</span></div></div>
+    <div class="stat"><div class="label">มติไม่ผ่าน</div><div class="value" id="s-fail">—</div><div class="note"><span class="dot" style="background:var(--fail)"></span><span id="s-fail-pct">—</span></div></div>
+    <div class="stat"><div class="label">คะแนนเสียงที่บันทึก</div><div class="value" id="s-votes">—</div><div class="note">รวมผู้ลา / ขาดลงมติ</div></div>
+  </section>
+
+  <h2 class="section-title">วิธีอ่าน</h2>
+  <section class="howto">
+    <div><div class="n">I</div><p>หนึ่งจุดคือการลงมติหนึ่งครั้ง เรียงตามปีในแนวนอน และตามวันที่ลงมติในแนวตั้ง สีบอกว่ามติผ่านหรือไม่ผ่าน</p></div>
+    <div><div class="n">II</div><p>คลิกที่จุดเพื่อซูมเข้าไป จะเห็นแต่ละพรรคล้อมรอบ ขนาดวงตามจำนวนผู้ลงคะแนน สีตามเสียงข้างมากของพรรค</p></div>
+    <div><div class="n">III</div><p>คลิกที่พรรคเพื่อดูรายชื่อสมาชิกว่าใครลงมติอย่างไร คลิกพื้นหลังเพื่อกลับสู่ภาพรวม</p></div>
+  </section>
+
+  <section class="controls" aria-label="ตัวกรอง">
     <div id="creatorFilter"></div>
     <div id="categoryFilter"></div>
   </section>
 
-  <div id="status">กำลังโหลดข้อมูล…</div>
-  <section id="chart"></section>
+  <figure>
+    <div class="frame">
+      <div id="status">กำลังเรียงเอกสารการลงมติ…</div>
+      <div id="chart"></div>
+    </div>
+    <figcaption>
+      <span>ภาพ 1 — ผลการลงมติรายญัตติ แยกตามปีและวันที่</span>
+      <span>ที่มา: Politigraph (WeVis)</span>
+    </figcaption>
+  </figure>
 
-  <footer>
-    Source notebook: <a href="https://observablehq.com/@politigraphtest/rada_leela" target="_blank" rel="noopener">@politigraphtest/rada_leela</a>
-  </footer>
+  <section class="notes">
+    <div>
+      <h3>นิยาม “มติผ่าน”</h3>
+      <p>ในภาพนี้นับว่าผ่านเมื่อเสียง <em>เห็นด้วย</em> มากกว่าเสียง <em>ไม่เห็นด้วย</em> ภายในข้อมูลที่กรองอยู่ ผลจึงอาจต่างจากมติทางการที่ใช้เกณฑ์องค์ประชุมและเสียงข้างมากตามข้อบังคับ</p>
+    </div>
+    <div>
+      <h3>ข้อมูล</h3>
+      <p>บันทึกการลงคะแนนรายบุคคล 107,826 รายการ จาก 1,340 คนใน 46 พรรคและกลุ่ม ระหว่าง ม.ค. 2563 ถึง ต.ค. 2568 ต่อยอดจาก notebook <a href="https://observablehq.com/@politigraphtest/rada_leela" target="_blank" rel="noopener">rada_leela</a></p>
+    </div>
+  </section>
 </main>
+
+<footer><div class="wrap">
+  <span class="brand">POLITIGRAPH</span>
+  <span><a href="https://github.com/tpootth/politigraph-viz" target="_blank" rel="noopener">ซอร์สโค้ด</a> · ข้อมูล <a href="https://politigraph.wevis.info/docs" target="_blank" rel="noopener">WeVis</a></span>
+</div></footer>
 
 <script type="module">
 import define from "./index.js";
@@ -60,10 +215,28 @@ const slots = {
   "chart": "chart"
 };
 const status = document.getElementById("status");
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString("th-TH");
+const pct = (a, b) => b ? (a / b * 100).toFixed(1) + "%" : "—";
+let totalEvents = null; // first (unfiltered) value
+
+function renderStats(motions) {
+  const pass = motions.filter(d => d.motion_result === "ผ่าน").length;
+  const fail = motions.length - pass;
+  totalEvents ??= motions.length;
+  $("s-motions").textContent = fmt(motions.length);
+  $("s-motions-note").textContent = motions.length === totalEvents ? "บางญัตติลงมติมากกว่าหนึ่งวัน" : `จากทั้งหมด ${fmt(totalEvents)} ครั้ง`;
+  $("s-pass").textContent = fmt(pass);
+  $("s-fail").textContent = fmt(fail);
+  $("s-pass-pct").textContent = pct(pass, motions.length) + " ของที่แสดง";
+  $("s-fail-pct").textContent = pct(fail, motions.length) + " ของที่แสดง";
+  $("s-votes").textContent = fmt(motions.reduce((s, d) => s + d.total_votes, 0));
+}
 
 new Runtime().module(define, name => {
+  if (name === "motions_fast") return { fulfilled: renderStats };
   if (!(name in slots)) return;
-  const inspector = new Inspector(document.getElementById(slots[name]));
+  const inspector = new Inspector($(slots[name]));
   if (name !== "chart") return inspector;
   return {
     pending() { inspector.pending(); },
