@@ -12,16 +12,18 @@
 <style>
   :root {
     color-scheme: light;
-    --paper: #ffffff;
+    --paper: #eef0f3;
     --card: #ffffff;
-    --ink: #111111;
-    --ink-2: #333333;
-    --muted: #555555;
-    --rule: #d4d4d0;
-    --hair: #e6e6e2;
+    --navy: #14213d;
+    --ink: #1f2329;
+    --ink-2: #3a3f47;
+    --muted: #3a3f47;
+    --rule: #d3d8df;
+    --hair: #e4e7ec;
     --pass: #2a5f9e;
     --fail: #b23a2e;
     --gold: #8a6416;
+    --gold-on-navy: #e0b96a;
     --serif: "Noto Serif Thai", Georgia, serif;
     --sans: "IBM Plex Sans Thai", "Sarabun", system-ui, sans-serif;
   }
@@ -38,44 +40,46 @@
   .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 
   /* masthead */
-  .masthead { border-bottom: 1px solid var(--ink); }
+  .top { background: var(--navy); color: #fff; }
+  .masthead { border-bottom: 1px solid rgba(255,255,255,.18); }
   .masthead .wrap {
     display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
     padding-top: 18px; padding-bottom: 12px;
-    font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2);
+    font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: #d6dce8;
   }
-  .masthead .brand { font-family: var(--serif); font-weight: 700; letter-spacing: .18em; color: var(--ink); }
-  .masthead + .rule { height: 3px; border-bottom: 1px solid var(--ink); }
+  .masthead .brand { font-family: var(--serif); font-weight: 700; letter-spacing: .18em; color: #fff; }
 
   /* hero */
-  .hero { padding: 64px 0 40px; text-align: center; }
+  .hero { padding: 64px 16px 72px; text-align: center; }
   .kicker {
-    display: inline-block; font-size: 12px; letter-spacing: .2em; color: var(--gold);
-    border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); padding: 4px 14px; margin-bottom: 28px;
+    display: inline-block; font-size: 14px; font-weight: 500; letter-spacing: .2em; color: var(--gold-on-navy);
+    border-top: 1px solid var(--gold-on-navy); border-bottom: 1px solid var(--gold-on-navy); padding: 4px 14px; margin-bottom: 28px;
   }
   h1 {
     font-family: var(--serif); font-weight: 600; font-size: clamp(2.4rem, 6vw, 4.2rem);
-    line-height: 1.15; margin: 0 0 20px; letter-spacing: -.01em;
+    line-height: 1.15; margin: 0 0 20px; letter-spacing: -.01em; color: #fff;
   }
   .dek {
-    max-width: 640px; margin: 0 auto; font-size: 1.12rem; font-weight: 400; color: var(--ink-2);
+    max-width: 640px; margin: 0 auto; font-size: 1.15rem; font-weight: 400; color: #d6dce8;
   }
-  .byline { margin-top: 24px; font-size: 13px; color: var(--muted); }
+  .byline { margin-top: 24px; font-size: 14px; color: #d6dce8; }
+  .byline a { text-decoration-color: rgba(255,255,255,.4); }
 
   /* stats */
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 6px; box-shadow: 0 1px 2px rgba(20,33,61,.05); }
   .stats {
     display: grid; grid-template-columns: repeat(4, 1fr);
-    border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule);
-    margin: 8px 0 48px;
+    margin: -40px 0 32px; position: relative; overflow: hidden;
+    border-top: 4px solid var(--gold);
   }
   .stat { padding: 20px 20px 18px; border-left: 1px solid var(--hair); }
   .stat:first-child { border-left: 0; }
-  .stat .label { font-size: 12px; letter-spacing: .08em; color: var(--muted); }
+  .stat .label { font-size: 14px; font-weight: 600; color: var(--ink-2); }
   .stat .value {
-    font-family: var(--serif); font-weight: 600; font-size: 2.1rem; line-height: 1.2; margin-top: 4px;
+    font-family: var(--serif); font-weight: 600; font-size: 2.2rem; line-height: 1.2; margin-top: 4px; color: var(--navy);
     font-variant-numeric: tabular-nums;
   }
-  .stat .note { font-size: 12px; color: var(--ink-2); }
+  .stat .note { font-size: 14px; color: var(--ink-2); }
   .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
 
   /* how to read */
@@ -83,50 +87,51 @@
     display: flex; align-items: center; gap: 14px; margin: 0 0 20px;
     font-family: var(--serif); font-weight: 600; font-size: 1.35rem;
   }
-  .section-title::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
-  .howto { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-bottom: 48px; }
+  .section-title::after { content: ""; flex: 1; height: 1px; background: #c3cad4; }
+  .howto { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+  .howto > div { padding: 20px 22px; }
   .howto .n { font-family: var(--serif); font-size: 1.6rem; color: var(--gold); line-height: 1; }
-  .howto p { margin: 8px 0 0; font-size: .95rem; color: var(--ink-2); }
+  .howto p { margin: 8px 0 0; font-size: 1rem; color: var(--ink); }
 
   /* controls */
   .controls {
     display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 28px;
-    padding: 22px 0; margin-bottom: 20px;
-    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+    padding: 22px 24px; margin-bottom: 16px;
   }
   .controls form { font-family: var(--sans) !important; font-size: 14px !important; color: var(--ink) !important; margin: 0 !important; width: auto !important; max-width: none !important; display: block !important; }
   .controls form > label {
     display: block !important; width: auto !important; margin-bottom: 8px !important; padding: 0 !important;
-    font-size: 12px !important; letter-spacing: .08em; color: var(--muted) !important;
+    font-size: 14px !important; font-weight: 600; color: var(--ink) !important;
   }
   .controls select {
     width: 100%; font: inherit; color: var(--ink); background: var(--card);
-    border: 1px solid var(--rule); border-radius: 2px; padding: 8px 10px;
+    border: 1px solid #b9c0ca; border-radius: 2px; padding: 8px 10px;
   }
   .controls form > div { display: flex !important; flex-wrap: wrap; gap: 6px; }
   .controls form > div > label {
     display: inline-flex !important; align-items: center; gap: 6px; margin: 0 !important;
-    padding: 4px 12px; border: 1px solid var(--rule); border-radius: 999px; background: var(--card);
-    font-size: 13px; cursor: pointer; transition: border-color .15s, background .15s;
+    padding: 4px 12px; border: 1px solid #b9c0ca; border-radius: 999px; background: var(--card);
+    font-size: 14px; cursor: pointer; transition: border-color .15s, background .15s;
   }
   .controls form > div > label:hover { border-color: var(--ink-2); }
-  .controls form > div > label:has(input:checked) { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .controls form > div > label:has(input:checked) { background: var(--navy); border-color: var(--navy); color: #fff; }
   .controls input[type=checkbox] { accent-color: var(--ink); margin: 0; }
 
   /* figure */
   figure { margin: 0 0 16px; }
-  .frame { background: var(--card); border: 1px solid var(--rule); overflow-x: auto; }
+  .frame { overflow-x: auto; }
   #chart > div { margin: 0 auto; }
   #status { padding: 120px 24px; text-align: center; color: var(--muted); font-style: italic; font-family: var(--serif); }
-  figcaption { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 12px; color: var(--muted); }
+  figcaption { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; color: var(--ink-2); }
 
-  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin: 56px 0 0; font-size: .92rem; color: var(--ink-2); }
+  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 32px 0 0; font-size: .95rem; color: var(--ink); }
+  .notes > div { padding: 20px 22px; }
   .notes h3 { font-family: var(--serif); font-weight: 600; font-size: 1.05rem; color: var(--ink); margin: 0 0 8px; }
   .notes p { margin: 0; }
 
-  footer { margin-top: 72px; border-top: 1px solid var(--ink); }
-  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-top: 18px; padding-bottom: 40px; font-size: 12px; color: var(--muted); }
-  footer .brand { font-family: var(--serif); font-weight: 700; letter-spacing: .18em; color: var(--ink); }
+  footer { margin-top: 56px; background: var(--navy); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-top: 18px; padding-bottom: 40px; font-size: 13px; color: #d6dce8; }
+  footer .brand { font-family: var(--serif); font-weight: 700; letter-spacing: .18em; color: #fff; }
 
   /* Observable inspector chrome off */
   .observablehq--error { color: var(--fail); font-family: var(--sans); }
@@ -136,28 +141,29 @@
     .stat:nth-child(3) { border-left: 0; }
     .stat:nth-child(n+3) { border-top: 1px solid var(--hair); }
     .howto, .notes, .controls { grid-template-columns: 1fr; gap: 20px; }
-    .hero { padding: 40px 0 28px; }
+    .hero { padding: 40px 16px 64px; }
     .masthead .edition { display: none; }
   }
 </style>
 </head>
 <body>
 
+<div class="top">
 <div class="masthead"><div class="wrap">
   <span class="brand">POLITIGRAPH</span>
   <span class="edition">รายงานข้อมูล · การลงมติในรัฐสภาไทย</span>
 </div></div>
-<div class="rule"></div>
-
-<main class="wrap">
-  <header class="hero">
+<header class="hero">
     <div class="kicker">พ.ศ. ๒๕๖๓ – ๒๕๖๘</div>
     <h1>เสียงในสภา</h1>
     <p class="dek">ร่างกฎหมายและญัตติ 180 เรื่อง สมาชิกกว่าหนึ่งพันคน กับคำถามเดียว — แต่ละพรรคยกมือให้อะไร และปฏิเสธอะไร</p>
     <div class="byline">ข้อมูลจาก <a href="https://politigraph.wevis.info/docs" target="_blank" rel="noopener">Politigraph · WeVis</a></div>
-  </header>
+</header>
+</div>
 
-  <section class="stats" aria-live="polite">
+<main class="wrap">
+
+  <section class="stats card" aria-live="polite">
     <div class="stat"><div class="label">ครั้งที่ลงมติ</div><div class="value" id="s-motions">—</div><div class="note" id="s-motions-note">&nbsp;</div></div>
     <div class="stat"><div class="label">มติผ่าน</div><div class="value" id="s-pass">—</div><div class="note"><span class="dot" style="background:var(--pass)"></span><span id="s-pass-pct">—</span></div></div>
     <div class="stat"><div class="label">มติไม่ผ่าน</div><div class="value" id="s-fail">—</div><div class="note"><span class="dot" style="background:var(--fail)"></span><span id="s-fail-pct">—</span></div></div>
@@ -166,18 +172,18 @@
 
   <h2 class="section-title">วิธีอ่าน</h2>
   <section class="howto">
-    <div><div class="n">I</div><p>หนึ่งจุดคือการลงมติหนึ่งครั้ง เรียงตามปีในแนวนอน และตามวันที่ลงมติในแนวตั้ง สีบอกว่ามติผ่านหรือไม่ผ่าน</p></div>
-    <div><div class="n">II</div><p>คลิกที่จุดเพื่อซูมเข้าไป จะเห็นแต่ละพรรคล้อมรอบ ขนาดวงตามจำนวนผู้ลงคะแนน สีตามเสียงข้างมากของพรรค</p></div>
-    <div><div class="n">III</div><p>คลิกที่พรรคเพื่อดูรายชื่อสมาชิกว่าใครลงมติอย่างไร คลิกพื้นหลังเพื่อกลับสู่ภาพรวม</p></div>
+    <div class="card"><div class="n">I</div><p>หนึ่งจุดคือการลงมติหนึ่งครั้ง เรียงตามปีในแนวนอน และตามวันที่ลงมติในแนวตั้ง สีบอกว่ามติผ่านหรือไม่ผ่าน</p></div>
+    <div class="card"><div class="n">II</div><p>คลิกที่จุดเพื่อซูมเข้าไป จะเห็นแต่ละพรรคล้อมรอบ ขนาดวงตามจำนวนผู้ลงคะแนน สีตามเสียงข้างมากของพรรค</p></div>
+    <div class="card"><div class="n">III</div><p>คลิกที่พรรคเพื่อดูรายชื่อสมาชิกว่าใครลงมติอย่างไร คลิกพื้นหลังเพื่อกลับสู่ภาพรวม</p></div>
   </section>
 
-  <section class="controls" aria-label="ตัวกรอง">
+  <section class="controls card" aria-label="ตัวกรอง">
     <div id="creatorFilter"></div>
     <div id="categoryFilter"></div>
   </section>
 
   <figure>
-    <div class="frame">
+    <div class="frame card">
       <div id="status">กำลังเรียงเอกสารการลงมติ…</div>
       <div id="chart"></div>
     </div>
@@ -188,11 +194,11 @@
   </figure>
 
   <section class="notes">
-    <div>
+    <div class="card">
       <h3>นิยาม “มติผ่าน”</h3>
       <p>ในภาพนี้นับว่าผ่านเมื่อเสียง <em>เห็นด้วย</em> มากกว่าเสียง <em>ไม่เห็นด้วย</em> ภายในข้อมูลที่กรองอยู่ ผลจึงอาจต่างจากมติทางการที่ใช้เกณฑ์องค์ประชุมและเสียงข้างมากตามข้อบังคับ</p>
     </div>
-    <div>
+    <div class="card">
       <h3>ข้อมูล</h3>
       <p>บันทึกการลงคะแนนรายบุคคล 107,826 รายการ จาก 1,340 คนใน 46 พรรคและกลุ่ม ระหว่าง ม.ค. 2563 ถึง ต.ค. 2568 ต่อยอดจาก notebook <a href="https://observablehq.com/@politigraphtest/rada_leela" target="_blank" rel="noopener">rada_leela</a></p>
     </div>

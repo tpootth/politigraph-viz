@@ -20,7 +20,7 @@ R = [
  ('.call(g=>g.selectAll("text").attr("fill","#dde3ea"))', '.call(g=>g.selectAll("text").attr("fill","#333333").style("font-size","13px").style("font-weight",600))'),
  ('.call(g=>g.selectAll(".domain").attr("stroke","#99aab5").attr("opacity",0.2))', '.call(g=>g.selectAll(".domain").attr("stroke","#bdbdb8").attr("opacity",1))'),
  ('.call(g=>g.selectAll(".tick line").attr("stroke","#99aab5").attr("opacity",0.2));', '.call(g=>g.selectAll(".tick line").attr("stroke","#bdbdb8").attr("opacity",1));'),
- ('.call(g=>g.selectAll("text").attr("fill","#cfd7df").style("font-size","11px"))', '.call(g=>g.selectAll("text").attr("fill","#555555").style("font-size","11px"))'),
+ ('.call(g=>g.selectAll("text").attr("fill","#cfd7df").style("font-size","11px"))', '.call(g=>g.selectAll("text").attr("fill","#3a3f47").style("font-size","12px"))'),
  # pulse: a quiet ring instead of a neon flash
  ('''    0%   { filter: brightness(1) drop-shadow(0 0 3px currentColor); }
     50%  { filter: brightness(2) drop-shadow(0 0 20px currentColor); }
@@ -34,7 +34,7 @@ R = [
  # legend
  ('[["ผ่าน","#2fb546"],["ไม่ผ่าน","#bf3737"]]', '[["มติผ่าน",NEON_GREEN],["มติไม่ผ่าน",NEON_RED]]'),
  ('''g.append("circle").attr("r",6).attr("fill",d[1]).attr("cy",-2).attr("opacity",0.9);''', '''g.append("circle").attr("r",5).attr("fill",d[1]).attr("cy",-4);'''),
- ('''.text(d[0]).attr("font-size",11).attr("fill","#e7edf3");''', '''.text(d[0]).attr("font-size",12).attr("fill","#333333");'''),
+ ('''.text(d[0]).attr("font-size",11).attr("fill","#e7edf3");''', '''.text(d[0]).attr("font-size",13).attr("font-weight",500).attr("fill","#1f2329");'''),
  # tooltip
  ('.style("background", "rgba(15,15,20,0.88)")', '.style("background", "#ffffff").style("border", "1px solid #dcdcd8")'),
  ('.style("color", "#e8f0ff")', '.style("color", "#111111")'),

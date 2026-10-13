@@ -109,7 +109,7 @@ function _chart(d3,motions_fast,data_view)
   const yAxis = g => g.attr("transform", `translate(${margin.left - 10},0)`)
     .call(d3.axisLeft(d3.scalePoint().domain(ticks.map(t=>t.doy)).range([H - margin.bottom, margin.top]))
       .tickFormat((_,i)=>ticks[i]?.label ?? "").tickSize(0))
-    .call(g=>g.selectAll("text").attr("fill","#555555").style("font-size","11px"))
+    .call(g=>g.selectAll("text").attr("fill","#3a3f47").style("font-size","12px"))
     .call(g=>g.selectAll(".domain").remove());
 
   svg.append("g").call(xAxis);
@@ -191,7 +191,7 @@ svg.append("style").text(`
   [["มติผ่าน",NEON_GREEN],["มติไม่ผ่าน",NEON_RED]].forEach((d,i)=>{
     const g = legend.append("g").attr("transform", `translate(${i*95},0)`);
     g.append("circle").attr("r",5).attr("fill",d[1]).attr("cy",-4);
-    g.append("text").attr("x",10).attr("y",2).text(d[0]).attr("font-size",12).attr("fill","#333333");
+    g.append("text").attr("x",10).attr("y",2).text(d[0]).attr("font-size",13).attr("font-weight",500).attr("fill","#1f2329");
   });
 
   // ===== layers =====
