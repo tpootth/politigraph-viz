@@ -145,6 +145,7 @@
     .masthead .edition { display: none; }
   }
 </style>
+<link rel="stylesheet" href="./explorer.css">
 </head>
 <body>
 
@@ -170,6 +171,24 @@
     <div class="stat"><div class="label">คะแนนเสียงที่บันทึก</div><div class="value" id="s-votes">—</div><div class="note">รวมผู้ลา / ขาดลงมติ</div></div>
   </section>
 
+  <section class="card explorer-controls" aria-label="ปรับข้อมูลและกราฟ">
+    <div class="explorer-heading"><div><h2>สำรวจเสียงในสภา</h2><p>ปรับตัวเลขเพื่อเปรียบเทียบข้อมูล กราฟทุกส่วนเปลี่ยนตามตัวกรอง</p></div><button id="reset-explorer" type="button">คืนค่าเริ่มต้น</button></div>
+    <div class="knobs">
+      <label>ตั้งแต่ปี พ.ศ.<input id="year-from" type="number" min="2563" max="2568" value="2563"></label>
+      <label>ถึงปี พ.ศ.<input id="year-to" type="number" min="2563" max="2568" value="2568"></label>
+      <label>เสียงที่บันทึกขั้นต่ำ <output id="minimum-value">0</output><input id="minimum" type="range" min="0" max="800" step="10" value="0"></label>
+      <label>ขนาดจุด <output id="radius-value">10</output><input id="radius" type="range" min="4" max="18" value="10"></label>
+      <label>ความสูงกราฟ <output id="height-value">780</output><input id="height" type="range" min="480" max="1100" step="20" value="780"></label>
+      <label>ค้นหาญัตติ<input id="motion-search" type="search" placeholder="ชื่อญัตติหรือคำสำคัญ"></label>
+    </div>
+    <p id="filter-state" role="status"></p>
+  </section>
+  <section class="visual-grid" aria-label="ภาพรวมการลงมติ">
+    <div class="card summary-panel"><h2>มติผ่านและไม่ผ่านในแต่ละปี</h2><p>ความยาวแท่งแสดงจำนวนครั้ง · คลิกปีเพื่อกรอง</p><div id="year-bars"></div></div>
+    <div class="card summary-panel"><h2>สัดส่วนเสียงที่บันทึก</h2><p>รวมทุกญัตติที่เลือก · ชี้ที่แถบเพื่อดูจำนวน</p><div id="vote-bars"></div></div>
+  </section>
+  <section class="card summary-panel ranking"><div class="explorer-heading"><h2>ญัตติที่เสียงใกล้เคียงกัน</h2><label>แสดง <input id="top-count" type="number" min="1" max="50" value="8"> รายการ</label></div><p>เรียงตามส่วนต่างระหว่างเห็นด้วยกับไม่เห็นด้วย · กดชื่อเพื่ออ่านคะแนน</p><div id="motion-ranking"></div></section>
+  <h2 class="section-title">เจาะลึกแต่ละญัตติ</h2>
   <h2 class="section-title">วิธีอ่าน</h2>
   <section class="howto">
     <div class="card"><div class="n">I</div><p>หนึ่งจุดคือการลงมติหนึ่งครั้ง เรียงตามปีในแนวนอน และตามวันที่ลงมติในแนวตั้ง สีบอกว่ามติผ่านหรือไม่ผ่าน</p></div>
@@ -212,6 +231,7 @@
 
 <script type="module">
 import define from "./index.js";
+import {setupExplorer, updateOverview} from "./explorer.js";
 import {Runtime, Inspector} from "./runtime.js";
 
 // Render only the cells we want on the page; everything else still runs but stays hidden.
@@ -239,8 +259,8 @@ function renderStats(motions) {
   $("s-votes").textContent = fmt(motions.reduce((s, d) => s + d.total_votes, 0));
 }
 
-new Runtime().module(define, name => {
-  if (name === "motions_fast") return { fulfilled: renderStats };
+const main = new Runtime().module(define, name => {
+  if (name === "motions_fast") return { fulfilled(motions) { renderStats(motions); updateOverview(motions); } };
   if (!(name in slots)) return;
   const inspector = new Inspector($(slots[name]));
   if (name !== "chart") return inspector;
@@ -250,6 +270,7 @@ new Runtime().module(define, name => {
     rejected(error) { status.textContent = "โหลดไม่สำเร็จ: " + error.message; inspector.rejected(error); }
   };
 });
+setupExplorer(main);
 </script>
 </body>
 </html>

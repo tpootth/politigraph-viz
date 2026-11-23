@@ -29,16 +29,16 @@ Inputs.checkbox(pre.categories, {
 })
 )}
 
-function _chart(d3,motions_fast,data_view)
+function _chart(d3,motions_fast,data_view,displaySettings,invalidation)
 {
   // ===== helpers & sources =====
   const sameDay = (a,b)=>d3.timeDay.floor(a).getTime()===d3.timeDay.floor(b).getTime();
-  const M = motions_fast;          // ✅ summary แบบเร็ว (มติ)
+  const M = motions_fast.map(d => ({...d}));          // ✅ summary แบบเร็ว (มติ)
   const DATA = data_view;          // ✅ ดาต้าดิบหลังกรอง ใช้ตอน tooltip/panel/stacked bar
 
   // ===== layout =====
   const TITLE_H = 10;              // ความสูงพื้นที่หัวกราฟ
-  const W = 1000, H = 780;
+  const W = 1000, H = displaySettings.height;
   const margin = { top: 60 + TITLE_H, right: 20, bottom: 30, left: 60 };
 
   // ===== font & anim =====
@@ -50,7 +50,7 @@ function _chart(d3,motions_fast,data_view)
   const x = d3.scaleBand().domain(years).range([margin.left, W-margin.right]).padding(0.25);
   const maxDoy = d3.max(M, d=>d.dayOfYear) ?? 366;
   const y = d3.scaleLinear().domain([1, maxDoy]).range([H - margin.bottom, margin.top]);
-  const rMotion = () => 10;
+  const rMotion = () => displaySettings.radius;
 
   // ===== colors =====
   const NEON_GREEN="#2a5f9e", NEON_RED="#b23a2e", GRAY="#bcbcb6";
@@ -107,8 +107,8 @@ function _chart(d3,motions_fast,data_view)
   ticks.push({doy: d3.timeDay.count(new Date(yearRef,0,1), new Date(yearRef,11,31))+1, label: "12-31"});
 
   const yAxis = g => g.attr("transform", `translate(${margin.left - 10},0)`)
-    .call(d3.axisLeft(d3.scalePoint().domain(ticks.map(t=>t.doy)).range([H - margin.bottom, margin.top]))
-      .tickFormat((_,i)=>ticks[i]?.label ?? "").tickSize(0))
+    .call(d3.axisLeft(y).tickValues(ticks.filter(t => t.doy <= maxDoy).map(t => t.doy))
+      .tickFormat(v => ticks.find(t => t.doy === v)?.label ?? "").tickSize(0))
     .call(g=>g.selectAll("text").attr("fill","#3a3f47").style("font-size","12px"))
     .call(g=>g.selectAll(".domain").remove());
 
@@ -364,7 +364,7 @@ svg.append("style").text(`
     .on("click", (e, d) => { e.stopPropagation(); if (focusedMotion) return; focusMotion(d); });
 
   // force
-    d3.forceSimulation(M)
+    const motionSimulation = d3.forceSimulation(M)
       .force("x", d3.forceX(d => d.tx).strength(0.2))
       .force("y", d3.forceY(d => d.ty).strength(0.2))
       .force("collide", d3.forceCollide(d => rMotion(d) + 4).iterations(2)) // 👈 กันชนแน่นขึ้น
@@ -860,6 +860,7 @@ edges.transition()
   }
 
   // ===== return =====
+  invalidation.then(() => { motionSimulation.stop(); tip.remove(); M.forEach(d => clearTimeout(d.timeoutId)); });
   return container;
 }
 
@@ -952,7 +953,7 @@ function _data_view(fast){return(
 fast.data_view
 )}
 
-function _fast(pre,categoryFilter,creatorFilter,ALL){return(
+function _fast(pre,categoryFilter,creatorFilter,ALL,exploreSettings){return(
 (function () {
   const { rows, catIndex, motionIndex, motionsMeta, creatorIndex } = pre;
 
@@ -1040,7 +1041,9 @@ function _fast(pre,categoryFilter,creatorFilter,ALL){return(
     });
   }
 
-  return { data_view, motions_fast: out };
+  const selected = out.filter(d => d.year >= exploreSettings.from && d.year <= exploreSettings.to && d.total_votes >= exploreSettings.minimum && (!exploreSettings.search || d.motion_name.toLowerCase().includes(exploreSettings.search.toLowerCase())));
+  const keys = new Set(selected.map(d => `${+d.date}|${d.motion_name}`));
+  return { data_view: data_view.filter(r => keys.has(`${+new Date(r.start_date)}|${r.motion}`)), motions_fast: selected };
 })()
 )}
 
@@ -1289,6 +1292,8 @@ await FileAttachment("parliament_trans.csv").csv({typed:true})
 
 export default function define(runtime, observer) {
   const main = runtime.module();
+  main.define("exploreSettings", () => ({from:2020,to:2025,minimum:0,search:""}));
+  main.define("displaySettings", () => ({radius:10,height:780}));
   main.define("module 1", async () => runtime.module((await import("./a2e58f97fd5e8d7c@756.js")).default));
   const fileAttachments = new Map([
     ["parliament_trans.csv", {url: new URL("./files/12f39e77615062901b9750bd14ac8a5fd454d9b357c1c28034f7cc8332afbc79fa61e3bb7ea6df5c9f633c5dc3fe564059eeb03cfe7ec4e714de898d1f2b23a3.csv", import.meta.url), mimeType: "text/csv"}]
@@ -1302,11 +1307,11 @@ export default function define(runtime, observer) {
   main.variable(observer("creatorFilter")).define("creatorFilter", ["Generators", "viewof creatorFilter"], (G, _) => G.input(_));
   main.variable(observer("viewof categoryFilter")).define("viewof categoryFilter", ["Inputs","pre"], _categoryFilter);
   main.variable(observer("categoryFilter")).define("categoryFilter", ["Generators", "viewof categoryFilter"], (G, _) => G.input(_));
-  main.variable(observer("chart")).define("chart", ["d3","motions_fast","data_view"], _chart);
+  main.variable(observer("chart")).define("chart", ["d3","motions_fast","data_view","displaySettings","invalidation"], _chart);
   main.variable(observer("motions_fast")).define("motions_fast", ["fast"], _motions_fast);
   main.variable(observer("motions")).define("motions", ["d3","fast","data"], _motions);
   main.variable(observer("data_view")).define("data_view", ["fast"], _data_view);
-  main.variable(observer("fast")).define("fast", ["pre","categoryFilter","creatorFilter","ALL"], _fast);
+  main.variable(observer("fast")).define("fast", ["pre","categoryFilter","creatorFilter","ALL","exploreSettings"], _fast);
   main.variable(observer("pre")).define("pre", ["d3","data_norm"], _pre);
   main.variable(observer("creators")).define("creators", ["data_norm","ALL","d3"], _creators);
   main.variable(observer("data_norm")).define("data_norm", ["data","d3"], _data_norm);
